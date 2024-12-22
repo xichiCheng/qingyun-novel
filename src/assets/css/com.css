@@ -1,0 +1,25 @@
+.icon {
+    width: 2em; height: 2em;
+    vertical-align: -0.15em;
+    fill: currentColor;
+    overflow: hidden;
+}
+
+:deep(.el-tooltip__trigger:focus-visible) {
+    outline: unset;
+}
+
+.el-select-dropdown__item {
+    color: black !important;
+    font-size: 18px;
+    font-family: '华文中宋', serif !important;
+}
+
+.el-select-dropdown__item:hover {
+    border-radius: 8px !important;
+    color: red !important;
+}
+
+
+
+
