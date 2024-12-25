@@ -1,8 +1,20 @@
 <script setup>
 import { ref } from 'vue'
 import { ArrowDown, Search } from '@element-plus/icons-vue'
+import router from '@/router/index.js'
 
 const searchQuery = ref('')
+const handleSearch = () => {
+  const newRoute = router.resolve({ name: 'Search', params: { words: searchQuery.value } });
+  window.open(newRoute.href, '_blank'); // '_blank' 表示在新标签页打开
+  searchQuery.value=''
+};
+const toUser = ()=>{
+  const newRoute = router.resolve({ name: 'User'});
+  window.open(newRoute.href, '_blank');
+}
+
+
 const isLoggedIn = ref(true)
 
 const user = ref({
@@ -38,7 +50,7 @@ const categories = ref([
       <template #dropdown>
         <div class="dropdown-content">
           <span v-for="(category, index) in categories" :key="index">
-            <router-link :to="{ name: 'Category', params: { id: category.id } }">{{
+            <router-link :to="{ name: 'Category', params: { id: category.id } }" target="_blank">{{
               category.name
             }}</router-link>
           </span>
@@ -46,7 +58,7 @@ const categories = ref([
       </template>
     </el-dropdown>
 
-    <span class="rank"><router-link :to="{ name: 'Rank' }">排行</router-link></span>
+    <span class="rank"><router-link :to="{ name: 'Rank' }" target="_blank">排行</router-link></span>
 
     <!-- 搜索栏 -->
     <div class="search">
@@ -66,7 +78,7 @@ const categories = ref([
       <!-- 用户已登录 -->
       <div class="user-info">
         <span>欢迎~&nbsp;&nbsp;&nbsp;</span>
-        <router-link to="/my" class="myInfo">{{ user.username }}</router-link>
+        <router-link @click="toUser" to="/user" class="myInfo">{{ user.username }}</router-link>
         <span class="split">|</span>
         <router-link to="/login" class="logout">退出</router-link>
       </div>

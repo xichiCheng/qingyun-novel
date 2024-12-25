@@ -3,34 +3,34 @@ import { ref } from 'vue'
 import RankList from '@/components/RankList.vue'
 
 // 示例数据
-const monthlyTickets = ref([
-  { id: 1, name: '诡秘之主', number: 1200, type: '玄幻', author: '爱潜水的乌贼' },
-  { id: 2, name: '星辰变', number: 1100, type: '奇幻', author: '我吃西红柿' },
-  { id: 3, name: '盘龙', number: 1000, type: '奇幻', author: '我吃西红柿' },
-])
-
-const selling = ref([
-  { id: 1, name: '全职高手', number: '销量冠军', type: '游戏', author: '蝴蝶蓝' },
-  { id: 2, name: '斗破苍穹', number: 980, type: '玄幻', author: '天蚕土豆' },
-])
+const monthlyTickets = ref(
+  Array.from({ length: 10 }, () => ({
+    id: 1, name: '喜欢你我说了算', number: '123456', type: '现代言情', author: '叶非夜'
+  }))
+)
+const selling = ref(
+  Array.from({ length: 10 }, () => ({
+  id: 1, name: '喜欢你我说了算', number: '', type: '现代言情', author: '叶非夜'
+})))
 
 const newBooks = ref([
-  { id: 1, name: '万族之劫', number: 300, type: '玄幻', author: '老鹰吃小鸡' },
-  { id: 2, name: '大奉打更人', number: 250, type: '仙侠', author: '卖报小郎君' },
+  { id: 1, name: '喜欢你我说了算', number: '', type: '现代言情', author: '叶非夜' },
+  { id: 1, name: '喜欢你我说了算', number: '', type: '现代言情', author: '叶非夜' },
 ])
 
 const recommendations = ref([
-  { id: 2, name: '斗罗大陆', number: 450, type: '玄幻', author: '唐家三少' },
+  { id: 1, name: '喜欢你我说了算', number: '1211455', type: '现代言情', author: '叶非夜' },
+  { id: 1, name: '喜欢你我说了算', number: '233311', type: '现代言情', author: '叶非夜' },
 ])
 
 const collections = ref([
-  { id: 1, name: '剑来', number: 600, type: '玄幻', author: '烽火戏诸侯' },
-  { id: 2, name: '诛仙', number: 580, type: '仙侠', author: '萧鼎' },
+  { id: 1, name: '喜欢你我说了算', number: '2141414', type: '现代言情', author: '叶非夜' },
+  { id: 1, name: '喜欢你我说了算', number: '1211321', type: '现代言情', author: '叶非夜' },
 ])
 
 const wordCounts = ref([
-  { id: 1, name: '凡人修仙传', number: '446.5万字', type: '仙侠', author: '忘语' },
-  { id: 2, name: '圣墟', number: '400万字', type: '玄幻', author: '辰东' },
+  { id: 1, name: '喜欢你我说了算', number: '214214', type: '现代言情', author: '叶非夜' },
+  { id: 1, name: '喜欢你我说了算', number: '124122', type: '现代言情', author: '叶非夜' },
 ])
 
 const categories = ref([
@@ -76,7 +76,7 @@ const categories = ref([
       />
       <RankList
         title="新书热销榜"
-        type="2"
+        type="1"
         :books="newBooks"
         img="https://example.com/image3.jpg"
         class="rank"

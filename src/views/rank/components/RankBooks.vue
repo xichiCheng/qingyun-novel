@@ -185,7 +185,7 @@ const onCurrentChange = (currentPage) => {
 
     .time {
       position: absolute;
-      left: 300px;
+      left: 360px;
       top: 120px;
       font-size: 12px;
     }

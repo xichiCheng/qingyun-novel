@@ -218,7 +218,7 @@ const changeFontSize = (action) => {
         />
       </div>
       <div class="setting-dialog">
-        <el-dialog title="设置" v-model="settingIsVisible" width="500px">
+        <el-dialog title="设置" v-model="settingIsVisible" width="450px" top="240px" style="margin-left: 720px">
           <div class="settings-content">
             <!-- 阅读主题 -->
             <div class="setting-item">

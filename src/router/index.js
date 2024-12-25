@@ -9,6 +9,16 @@ const router = createRouter({
       redirect: '/home'
     },
     {
+      path: '/login',
+      name: 'Login',
+      component: () => import('@/views/login/LoginPage.vue'),
+    },
+    {
+      path: '/register',
+      name: 'Register',
+      component: ()=> import('@/views/login/RegisterPage.vue')
+    },
+    {
       path: '/home',
       name: 'Home',
       component: () => import('@/views/Home/HomePage.vue'),
@@ -89,7 +99,46 @@ const router = createRouter({
       name: 'Search',
       component: ()=> import('@/views/search/SearchPage.vue'),
       props: true
-    }
+    },
+    {
+      path: '/user',
+      name: 'User',
+      component: () => import('@/views/user/UserLayoutContainer.vue'),
+      redirect: '/user/',
+      children: [
+        {
+          path: '/user/',
+          name: 'UserProfile',
+          component: () => import('@/views/user/UserProfile.vue'),
+        },
+        {
+          path: '/user/account',
+          name: 'UserAccount',
+          component: () => import('@/views/user/UserAccount.vue'),
+        },
+        {
+          path: '/user/bookshelf',
+          name: 'UserBookshelf',
+          component: () => import('@/views/user/UserBookshelf.vue'),
+        },
+        {
+          path: '/user/tickets',
+          name: 'UserTickets',
+          component: () => import('@/views/user/UserTickets.vue'),
+        },
+        {
+          path: '/user/reviews',
+          name: 'UserReviews',
+          component: () => import('@/views/user/UserReviews.vue'),
+        },
+        {
+          path: '/user/setting',
+          name: 'UserSetting',
+          component: () => import('@/views/user/UserSetting.vue'),
+        },
+      ],
+    },
+
   ],
 })
 

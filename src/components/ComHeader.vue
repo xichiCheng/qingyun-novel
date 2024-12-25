@@ -4,7 +4,13 @@ import { Reading } from '@element-plus/icons-vue'
 import router from '@/router/index.js'
 const words = ref('')
 const search = () =>{
-    router.push({ name: 'Search', params: { words: words.value } })
+  const newRoute = router.resolve({ name: 'Search', params: { words: words.value } });
+  window.open(newRoute.href, '_blank'); // '_blank' 表示在新标签页打开
+  words.value = ''
+}
+const bookshelf = ()=>{
+  const newRoute = router.resolve({ name: 'UserBookshelf'});
+  window.open(newRoute.href, '_blank');
 }
 </script>
 
@@ -19,7 +25,7 @@ const search = () =>{
       <button @click="search">搜索</button>
     </div>
     <div class="bookshelf">
-      <el-button>
+      <el-button @click="bookshelf">
         <el-icon size="25px" ><Reading /></el-icon><span>我的书架</span>
       </el-button>
     </div>
