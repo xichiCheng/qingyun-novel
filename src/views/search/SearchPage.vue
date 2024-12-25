@@ -111,18 +111,28 @@ const clear = () => {
 const books = ref(
   Array.from({ length: 10 }, (_, i) => ({
     id: i,
-    title: '诡秘之主',
-    author: '爱潜水的乌贼',
-    category: '玄幻',
-    secondary_category: '异世大陆',
+    title: '喜欢你我说了算',
+    author: '叶非夜',
+    wordCount: 603000,
+    category: '现代言情',
+    secondary_category: '豪门世家',
     cover:
-      'https://chen-novel.oss-cn-hangzhou.aliyuncs.com/novel/fad8729e2f729578cb5d3bed2c1d6c37.jpeg',
+      'https://chen-novel.oss-cn-hangzhou.aliyuncs.com/novel/600.webp',
     status: 'complet',
     profile:
-      '蒸汽与机械的浪潮中，谁能触及非凡？历史和黑暗的迷雾里，又是谁在耳语？我从诡秘中醒来，睁眼看见这个世界:枪械，大炮，巨舰，飞空艇，差分机；魔药，占卜，诅咒，倒吊人，封印物……光明依旧照耀，神秘从未远离，这是一段“愚者”的传说。',
-    latestChapters: '第四十一章 新的旅程',
+      '林薇：我要上清华。\n' +
+      '江宿：我就不一样了。\n' +
+      '江宿：我除了要上清华，还要……你。\n' +
+      '…\n' +
+      '誓要上清华的学霸女主VS伪学霸真桀骜的男主\n' +
+      '…\n' +
+      '我这样的人不值得你喜欢。\n' +
+      '喜欢你我说了算。\n' +
+      '…\n' +
+      '【无论过去多少年，江宿和林薇都不会忘记那一天，那是他和她见面的第一天。】',
+    collection: 967999,
+    latestChapters: '第337章 我愿望都实现了呢',
     latestTime: '2022-11-25 16:27',
-    wordCount: 4430000,
     recommended: 9899900
   })),
 )
@@ -475,7 +485,7 @@ const handleSortChange = () => {
 
     .time {
       position: absolute;
-      left: 300px;
+      left: 350px;
       top: 130px;
       font-size: 12px;
       color: #016498;

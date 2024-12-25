@@ -1,35 +1,49 @@
-# novel
+# qingyun-novel
+一个简单的小说阅读网站前端UI
 
-This template should help get you started developing with Vue 3 in Vite.
+参考起点小说网
 
-## Recommended IDE Setup
+花了两个月学完前端3件套 + Vue3
 
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
+做这个玩具项目来练练手
 
-## Customize configuration
+### 主页
 
-See [Vite Configuration Reference](https://vite.dev/config/).
+![img.png](https://chen-novel.oss-cn-hangzhou.aliyuncs.com/introduced/QQ20241225-200217.png)
 
-## Project Setup
+![img.png](https://chen-novel.oss-cn-hangzhou.aliyuncs.com/introduced/QQ20241225-200329.png)
 
-```sh
-pnpm install
-```
+### 全部图书页
 
-### Compile and Hot-Reload for Development
+![img.png](https://chen-novel.oss-cn-hangzhou.aliyuncs.com/introduced/QQ20241225-200410.png)
 
-```sh
-pnpm dev
-```
+### 排行页
 
-### Compile and Minify for Production
+![img.png](https://chen-novel.oss-cn-hangzhou.aliyuncs.com/introduced/QQ20241225-200504.png)
 
-```sh
-pnpm build
-```
+![img.png](https://chen-novel.oss-cn-hangzhou.aliyuncs.com/introduced/QQ20241225-200540.png)
 
-### Lint with [ESLint](https://eslint.org/)
+### 搜索页
 
-```sh
-pnpm lint
-```
+![img.png](https://chen-novel.oss-cn-hangzhou.aliyuncs.com/introduced/QQ20241225-200626.png)
+
+### 分类页
+
+![img.png](https://chen-novel.oss-cn-hangzhou.aliyuncs.com/introduced/QQ20241225-200655.png)
+
+### 个人页
+
+![img.png](https://chen-novel.oss-cn-hangzhou.aliyuncs.com/introduced/QQ20241225-200727.png)
+
+![img.png](https://chen-novel.oss-cn-hangzhou.aliyuncs.com/introduced/QQ20241225-200747.png)
+
+![img.png](https://chen-novel.oss-cn-hangzhou.aliyuncs.com/introduced/QQ20241225-201006.png)
+
+### 书籍详情页
+
+![img.png](https://chen-novel.oss-cn-hangzhou.aliyuncs.com/introduced/QQ20241225-201255.png)
+
+### 章节页
+
+![img.png](https://chen-novel.oss-cn-hangzhou.aliyuncs.com/introduced/QQ20241225-201330.png)
+
