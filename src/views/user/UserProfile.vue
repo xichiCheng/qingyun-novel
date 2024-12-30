@@ -2,19 +2,14 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { Setting } from '@element-plus/icons-vue'
+import {useUserStore} from '@/stores/index.js'
 
 const router = useRouter()
+const store = useUserStore()
+
 
 // 模拟用户数据
-const user = ref({
-  avatar: 'https://chen-novel.oss-cn-hangzhou.aliyuncs.com/novel/avatar.jpg', // 头像占位图
-  username: '陈兮迟',
-  introduction: '这是我的简介，专注阅读与分享。',
-  balance: 100, // 账户余额
-  monthlyTickets: 5, // 月票数量
-  recommendTickets: 12, // 推荐票数量
-  bookshelfCount: 30, // 书架藏书数量
-})
+const user = ref(store.user)
 
 // 跳转到设置页面
 const goToSettings = () => {
@@ -70,7 +65,7 @@ const viewBookshelf = () => {
           <use xlink:href="#icon-toupiao"></use>
         </svg>
         <span class="title">我的票夹</span>
-        <p><span class="number">{{ user.monthlyTickets }}</span> 月票</p>
+        <p><span class="number">{{ user.passTickets }}</span> 月票</p>
         <p><span class="number">{{ user.recommendTickets }}</span> 推荐票</p>
         <el-divider></el-divider>
         <el-button @click="viewTickets">立即查看</el-button>

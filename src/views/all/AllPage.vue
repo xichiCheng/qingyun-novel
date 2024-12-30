@@ -1,10 +1,13 @@
 <script setup>
-import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
+import { ref, computed,onMounted, onBeforeUnmount } from 'vue'
 import ComShortcut from '@/components/ComShortcut.vue'
 import ComAffix from '@/components/ComAffix.vue'
 import ComHeader from '@/components/ComHeader.vue'
 import { CaretBottom, CaretTop } from '@element-plus/icons-vue'
-
+import router from '@/router/index.js'
+const route = computed(() => router.currentRoute.value);
+import {useCategoryStore} from '@/stores/index.js'
+const categoryStore = useCategoryStore()
 const selectedCategory = ref('')
 const searchQuery = ref('')
 const sortOrder = ref('')
@@ -16,16 +19,18 @@ const handleSortChange = () => {
   console.log(sortOrder.value)
 }
 
+
 const params = ref({
-  category: 0, // 主分类
-  subCategory: 0, // 子分类
-  status: '', // 状态
-  attribute: '', // 属性
+  categoryId: Number(route.value.query.categoryId) || 0, // 主分类
+  subCategoryId: Number(route.value.query.subCategoryId) || 0, // 子分类
+  status: Number(route.value.query.status) || 0 ,
+  attribute: Number(route.value.query.attribute) || 0, // 属性
   wordRange: '', // 字数范围
   tags: [], // 标签数组
   pageNum: 1, // 当前页码
   pageSize: 10, // 每页条数
 })
+
 const total = ref(0)
 //处理分页
 const onSizeChange = (size) => {
@@ -36,44 +41,14 @@ const onCurrentChange = (currentPage) => {
   params.value.pagenum = currentPage
 }
 
-const categories = ref([
-  { id: 1, name: '古代言情' },
-  { id: 2, name: '仙侠奇缘' },
-  { id: 3, name: '现代言情' },
-  { id: 4, name: '浪漫青春' },
-  { id: 5, name: '玄幻言情' },
-  { id: 6, name: '悬疑推理' },
-  { id: 7, name: '科幻空间' },
-  { id: 8, name: '游戏竞技' },
-  { id: 9, name: '衍生同人' },
-  { id: 10, name: '现实生活' },
-])
+const categories = ref(categoryStore.getCategories())
 
-const subcategories = ref({
-  0: [], // 默认空分类
-  1: [
-    { id: 1, name: '古代情缘' },
-    { id: 2, name: '宫闱宅斗' },
-    { id: 3, name: '经商种田' },
-    { id: 4, name: '古典架空' },
-    { id: 5, name: '女尊王朝' },
-    { id: 6, name: '穿越奇情' },
-    { id: 7, name: '西方时空' },
-    { id: 8, name: '清穿民国' },
-    { id: 9, name: '上古蛮荒' },
-  ],
-  2: [
-    { id: 21, name: '修仙' },
-    { id: 22, name: '仙侠奇幻' },
-  ],
-})
-
-const cursubcategorie = ref(0) // 默认值为 0
-
+const subcategories = ref(categoryStore.getSubCategories(Number(params.value.categoryId)))
 // 更新分类
-const setCategory = (category) => {
-  params.value.category = category.id
-  cursubcategorie.value = category.id
+const setCategory = (id) => {
+  params.value.categoryId = id
+  subcategories.value = categoryStore.getSubCategories(Number(params.value.categoryId))
+  params.value.subCategoryId = 0
 }
 
 const books = ref([])
@@ -305,21 +280,24 @@ onBeforeUnmount(() => {
         <div class="filter-category">
           <span class="title">分类</span>
           <div class="categories">
-            <span class="category-item" @click="setCategory(0)">全部</span>
+            <span class="category-item" @click="setCategory(0)" :class="{'categoryActive': params.categoryId===0}">全部</span>
             <span
               v-for="category in categories"
               :key="category.id"
               class="category-item"
-              @click="setCategory(category)"
+              @click="setCategory(category.id)"
+              :class="{'categoryActive': params.categoryId===category.id}"
             >
               {{ category.name }}
             </span>
           </div>
-          <div class="subcategories">
+          <div class="subcategories" :class="{'all': Number(params.categoryId)===0}">
             <span
-              v-for="sub in subcategories[cursubcategorie]"
+              v-for="sub in subcategories"
               :key="sub.id"
               class="subcategory-item"
+              :class="{'subcategoryActive': params.subCategoryId===sub.id}"
+              @click="params.subCategoryId=sub.id"
             >
               {{ sub.name }}
             </span>
@@ -329,9 +307,9 @@ onBeforeUnmount(() => {
           <span class="title">状态：</span>
           <div class="status">
             <el-radio-group v-model="params.status">
-              <el-radio-button :label="''"><span>全部</span></el-radio-button>
-              <el-radio-button :label="'ongoing'"><span>连载中</span></el-radio-button>
-              <el-radio-button :label="'completed'"><span>已完结</span></el-radio-button>
+              <el-radio-button :label="0"><span>全部</span></el-radio-button>
+              <el-radio-button :label="1"><span>连载中</span></el-radio-button>
+              <el-radio-button :label="2"><span>已完结</span></el-radio-button>
             </el-radio-group>
           </div>
         </div>
@@ -339,9 +317,9 @@ onBeforeUnmount(() => {
           <span class="title">属性：</span>
           <div class="status">
             <el-radio-group v-model="params.attribute">
-              <el-radio-button :label="''"><span>全部</span></el-radio-button>
-              <el-radio-button :label="'ongoing'"><span>免费</span></el-radio-button>
-              <el-radio-button :label="'completed'"><span>VIP</span></el-radio-button>
+              <el-radio-button :label="0"><span>全部</span></el-radio-button>
+              <el-radio-button :label="1"><span>免费</span></el-radio-button>
+              <el-radio-button :label="2"><span>VIP</span></el-radio-button>
             </el-radio-group>
           </div>
         </div>
@@ -511,21 +489,32 @@ onBeforeUnmount(() => {
 
     }
 
+    .categoryActive{
+      color: #ed0b38;
+    }
     .subcategories {
       margin-top: 10px;
+      padding: 5px 2px;
       background-color: #f5f5f5;
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 5px;
+      gap: 2px;
+    }
+    .all{
+      padding: 0;
     }
 
     .subcategory-item {
-      padding: 6px 3px;
+      padding: 5px 2px;
       text-align: center;
       cursor: pointer;
       font-size: 13px;
     }
 
+    .subcategoryActive{
+      background-color: #ed0b38;
+      color: white;
+    }
   }
 
   .filter-status {

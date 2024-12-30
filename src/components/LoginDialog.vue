@@ -16,6 +16,14 @@ const loginForm = ref({
   smsCode: "",
 });
 
+const isLogin = ref(false);
+const open = async () => {
+  isLogin.value = true;
+};
+defineExpose({
+  open,
+});
+
 
 const sendSmsCode = () => {
   if (!/^\d{11}$/.test(loginForm.value.phone)) {
@@ -64,80 +72,81 @@ const handleLogin = () => {
   userStore.setUser(user)
   ElMessage.success("登录成功！");
 
-  router.push('/');
+  isLogin.value = false
 
 };
 </script>
-<template>
-  <div class="main">
-    <div class="img">
-      <el-image :src="img"></el-image>
-    </div>
-    <div class="login-container">
-      <span class="title">登录</span>
-      <div class="input">
-        <el-form :model="loginForm" label-width="80px">
-          <el-form-item >
-            <el-input
-                      v-model="loginForm.phone"
-                      placeholder="请输入手机号"
-                      class="custom-input"
-                      maxlength="11"
-                      style="width: 300px"
-                      :prefix-icon="Iphone"
-                      />
-          </el-form-item>
-          <template v-if="isPasswordLogin">
-            <el-form-item >
-              <el-input v-model="loginForm.password" type="password" placeholder="请输入密码" style="width: 300px;"  :prefix-icon="Lock"/>
-            </el-form-item>
-            <div class="helper-links">
-              <span @click="isPasswordLogin = false" class="link">手机验证码登录</span>
-              <span> | </span>
-              <span @click="router.push('/register')" class="link">注册</span>
-            </div>
-          </template>
-          <template v-else>
-            <el-form-item >
-              <el-input v-model="loginForm.smsCode" placeholder="验证码" maxlength="6" style="width: 300px;">
-                <template #append>
-                  <el-button @click="sendSmsCode">发送验证码</el-button>
-                </template>
-              </el-input>
-            </el-form-item>
-            <div class="helper-links">
-              <span @click="isPasswordLogin = true" class="link">密码登录</span>
-              <span> | </span>
-              <span @click="router.push('/register')" class="link">注册</span>
-            </div>
-          </template>
-        </el-form>
-      </div>
-      <button class="login" @click="handleLogin">登录</button>
-    </div>
-  </div>
 
+<template>
+    <el-dialog v-model="isLogin" width="730px">
+      <div class="container">
+        <div class="img">
+          <el-image :src="img"></el-image>
+        </div>
+        <div class="login-container">
+          <span class="title">登录</span>
+          <div class="input">
+            <el-form :model="loginForm" label-width="80px">
+              <el-form-item >
+                <el-input
+                  v-model="loginForm.phone"
+                  placeholder="请输入手机号"
+                  class="custom-input"
+                  maxlength="11"
+                  style="width: 300px"
+                  :prefix-icon="Iphone"
+                />
+              </el-form-item>
+              <template v-if="isPasswordLogin">
+                <el-form-item >
+                  <el-input v-model="loginForm.password" type="password" placeholder="请输入密码" style="width: 300px;"  :prefix-icon="Lock"/>
+                </el-form-item>
+                <div class="helper-links">
+                  <span @click="isPasswordLogin = false" class="link">手机验证码登录</span>
+                  <span> | </span>
+                  <span @click="router.push('/register')" class="link">注册</span>
+                </div>
+              </template>
+              <template v-else>
+                <el-form-item >
+                  <el-input v-model="loginForm.smsCode" placeholder="验证码" maxlength="6" style="width: 300px;">
+                    <template #append>
+                      <el-button @click="sendSmsCode">发送验证码</el-button>
+                    </template>
+                  </el-input>
+                </el-form-item>
+                <div class="helper-links">
+                  <span @click="isPasswordLogin = true" class="link">密码登录</span>
+                  <span> | </span>
+                  <span @click="router.push('/register')" class="link">注册</span>
+                </div>
+              </template>
+            </el-form>
+          </div>
+          <button class="login" @click="handleLogin">登录</button>
+        </div>
+      </div>
+    </el-dialog>
 </template>
 
 <style scoped lang="scss">
-.main{
+.container{
+  height: 310px;
   display: flex;
 }
 
 .img{
-  margin-top: 120px;
-  margin-left: 80px;
-  width: 550px;
-  height: 400px;
+  margin-top: 40px;
+  width: 330px;
+  height: 200px;
 }
+
 .login-container {
-  margin-top: 120px;
   margin-left: 10px;
   width: 380px;
-  height: 320px;
-  padding: 20px;
-  border-radius: 10px;
-  border: 1px solid #e6e0e0;
+  height: 295px;
+
+  border-left: 1px solid #e6e0e0;
 
 
   .title{
@@ -145,7 +154,7 @@ const handleLogin = () => {
     text-align: center;
     font-size: 25px;
     margin-bottom: 20px;
-    margin-top: 10px;
+    color: black;
   }
   .input{
     margin-top: 30px;

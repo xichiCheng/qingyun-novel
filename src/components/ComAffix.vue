@@ -1,25 +1,26 @@
 <script setup>
 import { ref } from 'vue'
 import { ArrowDown, Search } from '@element-plus/icons-vue'
-import router from '@/router/index.js'
-
+import myRouter from '@/router/index.js'
+import { useRouter } from 'vue-router'
+import { useUserStore } from '@/stores/index.js'
+import LoginDialog from '@/components/LoginDialog.vue'
+import { ElMessageBox } from 'element-plus'
+const userStore = useUserStore()
+const router = useRouter()
 const searchQuery = ref('')
 const handleSearch = () => {
-  const newRoute = router.resolve({ name: 'Search', params: { words: searchQuery.value } });
+  const newRoute = myRouter.resolve({ name: 'Search', params: { words: searchQuery.value } });
   window.open(newRoute.href, '_blank'); // '_blank' 表示在新标签页打开
   searchQuery.value=''
 };
 const toUser = ()=>{
-  const newRoute = router.resolve({ name: 'User'});
+  const newRoute = myRouter.resolve({ name: 'User'});
   window.open(newRoute.href, '_blank');
 }
 
+const isLoggedIn = ref(userStore.token!=='')
 
-const isLoggedIn = ref(true)
-
-const user = ref({
-  username: 'Aurore',
-})
 
 const categories = ref([
   { id: 1, name: '古代言情' },
@@ -33,6 +34,28 @@ const categories = ref([
   { id: 9, name: '衍生同人' },
   { id: 10, name: '现实生活' },
 ])
+
+const loginDialogRef = ref()
+
+const openLoginDialog = () => {
+  loginDialogRef.value.open()
+}
+const bookshelf = ()=>{
+  const newRoute = myRouter.resolve({ name: 'UserBookshelf'});
+  window.open(newRoute.href, '_blank');
+}
+const logout = async () => {
+  await ElMessageBox.confirm('你确认要进行退出么', '温馨提示', {
+    type: 'warning',
+    confirmButtonText: '确认',
+    cancelButtonText: '取消',
+  })
+  userStore.removeToken()
+  userStore.setUser({})
+  isLoggedIn.value = false;
+  router.push('/')
+}
+
 </script>
 
 <template>
@@ -74,30 +97,34 @@ const categories = ref([
       </el-input>
     </div>
 
-    <div v-if="isLoggedIn">
+    <div v-if="userStore.token!==''">
       <!-- 用户已登录 -->
       <div class="user-info">
         <span>欢迎~&nbsp;&nbsp;&nbsp;</span>
-        <router-link @click="toUser" to="/user" class="myInfo">{{ user.username }}</router-link>
+        <router-link @click="toUser" to="/user" class="myInfo">{{ userStore.user.username  }}</router-link>
         <span class="split">|</span>
-        <router-link to="/login" class="logout">退出</router-link>
+        <span @click="logout"  class="logout">退出</span>
       </div>
     </div>
     <div v-else>
       <div class="user-dropdown">
-        <router-link to="/login" class="btn login-btn">登录</router-link>
+        <a  @click="openLoginDialog" class="btn login-btn" style="cursor: pointer">登录</a>
         <span class="split">|</span>
         <router-link to="/register" class="btn register-btn">注册</router-link>
       </div>
     </div>
     <span class="split">|</span>
     <!-- 我的书架按钮 -->
-    <span class="bookshelf">
+    <span class="bookshelf" @click="bookshelf">
       <svg class="icon bookshelfIcon" aria-hidden="true">
         <use xlink:href="#icon-wodeshujia"></use>
       </svg>
       书架
     </span>
+
+    <div>
+      <LoginDialog ref="loginDialogRef"></LoginDialog>
+    </div>
   </div>
 </template>
 

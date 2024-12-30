@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import { useUserStore } from '@/stores/index.js'
 
 
 const router = createRouter({
@@ -142,4 +143,18 @@ const router = createRouter({
   ],
 })
 
+router.beforeEach((to, from, next) => {
+  const userStore = useUserStore();
+  // 检查 token 是否存在并且有效
+  if (userStore.token && userStore.user.username) {
+    // 已登录，继续导航
+    next();
+  } else {
+    if ( to.name === 'User' || to.matched.some(record => record.name === 'User')) {
+      next({ name: 'Login' });
+    } else {
+      next();
+    }
+  }
+});
 export default router

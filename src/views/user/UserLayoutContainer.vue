@@ -1,17 +1,19 @@
 <script setup>
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
 import ComAffix from '@/components/ComAffix.vue';
+import { useUserStore } from '@/stores'
+const userStore = useUserStore()
+
+console.log('user:'+userStore.user.toString()+'token:'+userStore.token)
+
 
 const isScrolled = ref(false);
-
 const handleScroll = () => {
   isScrolled.value = window.scrollY > 50;
 };
-
 onMounted(() => {
   window.addEventListener('scroll', handleScroll);
 });
-
 onBeforeUnmount(() => {
   window.removeEventListener('scroll', handleScroll);
 });

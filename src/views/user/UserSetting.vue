@@ -2,13 +2,10 @@
 import { ref } from 'vue'
 import { Plus } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
+import { useUserStore} from '@/stores/index.js'
 
-const userInfo = ref({
-  nickname: 'Aurore',
-  avatar: 'https://chen-novel.oss-cn-hangzhou.aliyuncs.com/novel/avatar.jpg', // 初始头像 URL
-  gender: 'male',
-  introduction: '这是我的个人简介。',
-})
+const store = useUserStore()
+const userInfo = ref(store.user)
 
 const imgUrl = ref(userInfo.value.avatar)
 const uploadRef = ref()
@@ -23,7 +20,7 @@ const onSelectFile = (uploadFile) => {
 }
 
 const saveChanges = () => {
-  if (userInfo.value.nickname.length > 10) {
+  if (userInfo.value.username.length > 10) {
     ElMessage.error('昵称不得超过10个字！')
     return
   }
@@ -45,7 +42,7 @@ const saveChanges = () => {
       <!-- 昵称 -->
       <el-form-item label="昵称">
         <el-input
-          v-model="userInfo.nickname"
+          v-model="userInfo.username"
           placeholder="请输入您的昵称（不超过10个字）"
           maxlength="10"
           show-word-limit
@@ -81,9 +78,8 @@ const saveChanges = () => {
       <!-- 性别 -->
       <el-form-item label="性别">
         <el-radio-group v-model="userInfo.gender">
-          <el-radio label="male">男</el-radio>
-          <el-radio label="female">女</el-radio>
-          <el-radio label="other">其他</el-radio>
+          <el-radio :label="1">男</el-radio>
+          <el-radio :label="0">女</el-radio>
         </el-radio-group>
       </el-form-item>
 

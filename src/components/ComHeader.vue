@@ -4,6 +4,8 @@ import { Reading } from '@element-plus/icons-vue'
 import router from '@/router/index.js'
 const words = ref('')
 const search = () =>{
+  if(words.value==='')
+    return
   const newRoute = router.resolve({ name: 'Search', params: { words: words.value } });
   window.open(newRoute.href, '_blank'); // '_blank' 表示在新标签页打开
   words.value = ''
@@ -21,8 +23,8 @@ const bookshelf = ()=>{
       <span>专注于女性小说阅读平台</span>
     </div>
     <div class="search">
-      <input type="text" v-model="words" placeholder="搜索小说、作者" >
-      <button @click="search">搜索</button>
+      <input type="text" v-model="words" @keydown.enter="search" placeholder="搜索小说、作者" >
+      <button @click="search" >搜索</button>
     </div>
     <div class="bookshelf">
       <el-button @click="bookshelf">
@@ -60,25 +62,27 @@ const bookshelf = ()=>{
     float: left;
     border: 1px solid #ccc;
     border-radius: 20px;
-    width: 380px;
-    margin-left: 100px;
+    width: 400px;
+    margin-left: 120px;
     margin-top: 35px;
-
+    padding-bottom: 2px;
     input{
-      margin-top: 12px;
-      margin-left: 12px;
+      margin-bottom: 5px;
+      margin-left: 14px;
       border: none;
       outline: none;
-      width: 305px;
+      width: 312px;
+      font-size: 15px;
     }
     button{
-      height: 41px;
+      width: 70px;
+      height: 42px;
       padding: 0 15px;
       border: none;
       background-color: #19bad8;
       color: white;
       border-left: 1px solid #ccc;
-      font-size: 14px;
+      font-size: 16px;
       border-radius: 0 20px 20px 0;
     }
     button:hover{

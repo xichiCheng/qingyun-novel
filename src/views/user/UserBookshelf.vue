@@ -1,13 +1,13 @@
 <script setup>
 import { ref} from 'vue'
 import { ElMessage } from 'element-plus'
-
+import { useUserStore} from '@/stores/index.js'
+const store = useUserStore()
 const searchQuery = ref('') // 搜索框内容
 
 const books = ref(
-  Array.from({ length: 10 }, () => (
-    { id: 2, sign: true, category: '现代言情', name: '喜欢你我说了算', latestChapter: '第337章 我愿望都实现了呢', updateTime: '2024-12-23 22:00', author: '叶非夜' }
-  )))
+    store.user.books
+  )
 const selectedBooks = ref([]) // 被选中的书籍
 const isBottomBarVisible = ref(false) // 底部操作栏是否可见
 

@@ -1,7 +1,8 @@
 <script setup>
 import { ref } from 'vue'
-
-const balance = ref(1234) // 用户余额
+import {useUserStore} from '@/stores/index.js'
+const store = useUserStore()
+const balance = ref(store.user.balance) // 用户余额
 const params = ref({
   pageNum: 3, // 当前页码
   pageSize: 10, // 每页条数

@@ -1,18 +1,20 @@
 <script setup>
-import { ref } from 'vue';
+import { ref ,computed} from 'vue';
+import {useUserStore} from '@/stores/index.js'
 import passIcon from '@/assets/img/pass.png'
 import recommendedIcon from '@/assets/img/tuijian.png'
-// 模拟数据
-const monthlyVotes = ref({
-  obtained: 10, // 本月已获得
-  used: 5, // 已使用
-  available: 5, // 可用
-});
 
-const recommendVotes = ref({
-  obtained: 15, // 本日已获得
-  used: 8, // 已使用
-  available: 7, // 可用
+const store = useUserStore()
+const passTickets= ref(store.user.passTickets)
+const recommendTickets = ref(store.user.recommendTickets)
+const allPassTickets = ref(store.user.allPassTickets)
+const allRecommendTickets = ref(store.user.allRecommendTickets)
+
+const usedPassTickets = computed(() => {
+  return allPassTickets.value-passTickets.value
+})
+const usedRecommendTickets = computed(() => {
+  return allRecommendTickets.value - recommendTickets.value;
 });
 
 const monthlyVoteRecords = ref([
@@ -38,9 +40,9 @@ const recommendVoteRecords = ref([
       <div class="stats">
         <span class="title">月票</span>
         <div>
-          <p>本月已获得月票：<span>{{ monthlyVotes.obtained }}</span></p>
-          <p>已使用：<span>{{ monthlyVotes.used }}</span></p>
-          <p>可用：<span>{{ monthlyVotes.available }}</span></p>
+          <p>本月已获得月票：<span>{{ allPassTickets }}</span></p>
+          <p>已使用：<span>{{ usedPassTickets}}</span></p>
+          <p>可用：<span>{{ passTickets }}</span></p>
         </div>
       </div>
       <div class="explain">
@@ -56,9 +58,9 @@ const recommendVoteRecords = ref([
       <div class="stats">
         <span class="title">推荐票</span>
         <div>
-          <p>本日已获得推荐票：<span>{{ recommendVotes.obtained }}</span></p>
-          <p>已使用：<span>{{ recommendVotes.used }}</span></p>
-          <p>可用：<span>{{ recommendVotes.available }}</span></p>
+          <p>本日已获得推荐票：<span>{{ allRecommendTickets }}</span></p>
+          <p>已使用：<span>{{ usedRecommendTickets }}</span></p>
+          <p>可用：<span>{{ recommendTickets }}</span></p>
         </div>
       </div>
       <div class="explain">

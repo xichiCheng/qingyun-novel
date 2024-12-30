@@ -2,19 +2,31 @@
 import { ref } from 'vue'
 import ComAffix from '@/components/ComAffix.vue'
 import RankList from '@/components/RankList.vue'
+import router from '@/router/index.js'
+import { useCategoryStore} from '@/stores/index.js'
+const categoryStore = useCategoryStore()
+const props = defineProps({
+  id: {
+    type: Number
+  }
+})
+
+const words = ref('')
+const search = () =>{
+  if(words.value==='')
+    return
+  const newRoute = router.resolve({ name: 'Search', params: { words: words.value } });
+  window.open(newRoute.href, '_blank'); // '_blank' 表示在新标签页打开
+  words.value = ''
+}
+const toBookDetail = (bookId) => {
+  const newRoute = router.resolve({ name: 'BookDetail', params: { id: bookId }})
+  window.open(newRoute.href, '_blank')
+}
 
 // 示例数据
-const subCategories = [
-  '同人衍生',
-  '唯美幻想',
-  '萌系变身',
-  '青春日常',
-  '搞笑吐槽',
-  '影视衍生',
-  '古典衍生',
-  '动漫衍生',
-  '其他衍生',
-]
+const subCategories = categoryStore.getSubCategories(Number(props.id))
+const category = categoryStore.getCategory(Number(props.id))
 
 const weeklyBooksList = {
   title: '我们的世界姗姗来迟',
@@ -94,9 +106,6 @@ const sellingRank = ref(
 
 const sellingImg = ref('https://chen-novel.oss-cn-hangzhou.aliyuncs.com/novel/6BE3035189D88AB5F7AADDE305A98AD0.jpg')
 
-
-
-
 const activeIndex = ref(0)
 const sellingActiveIndex = ref(0)
 const currentBook = ref(newBooks.value[activeIndex.value])
@@ -145,23 +154,24 @@ const circleUrl = ref('https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726
     </el-affix>
     <!-- 第一行：标题和搜索框 -->
     <div class="header w">
-      <h1 class="main-title">衍生同人</h1>
+      <h1 class="main-title">{{category.name}}</h1>
       <div class="search">
-        <input type="text" placeholder="搜索小说、作者" />
-        <button>搜索</button>
+        <input v-model="words" @keydown.enter="search" type="text" placeholder="搜索小说、作者" />
+        <button @click="search">搜索</button>
       </div>
     </div>
 
     <!-- 第二行：二级分类和链接 -->
     <div class="sub-category w">
       <div class="categories">
-        <span v-for="(cat, index) in subCategories" :key="index" class="category">
-          {{ cat }}
+        <span v-for="(cat, index) in subCategories" :key="index" class="category" style="cursor: pointer">
+          <router-link :to="{ name: 'All', query: { categoryId: props.id, subCategoryId: cat.id } }"
+          >{{ cat.name }}</router-link>
         </span>
         <span class="divider">|</span>
-        <a href="#" class="link">衍生同人排行</a>
-        <a href="#" class="link">衍生同人完本</a>
-        <a href="#" class="link">衍生同人免费</a>
+        <a href="#" class="link">{{category.name}}排行</a>
+        <router-link class="link" :to="{ name: 'All', query: { categoryId: props.id,  status: 2 } }">{{category.name}}完本</router-link>
+        <router-link class="link" :to="{ name: 'All', query: { categoryId: props.id,  attribute: 1 } }">{{category.name}}免费</router-link>
       </div>
     </div>
 
@@ -182,7 +192,10 @@ const circleUrl = ref('https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726
         <div class="up">
           <div class="book-card" v-for="book in weeklyTopBooks" :key="book">
             <el-image :src="book.cover" alt="封面" class="img" />
-            <span class="name">{{ book.name }}</span>
+            <span class="name"><router-link :to="{ name: 'BookDetail', params: { id: book.id } }"  target="_blank">
+              {{ book.name }}
+            </router-link>
+            </span>
             <span class="description">{{ book.description }}</span>
           </div>
         </div>
@@ -190,7 +203,10 @@ const circleUrl = ref('https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726
         <div class="down">
           <span class="title"> 新书精选 </span>
           <div class="book" v-for="book in newBookFeatured" :key="book">
-            <span class="name">{{ book.name }}</span>
+            <span class="name"><router-link :to="{ name: 'BookDetail', params: { id: book.id } }"  target="_blank">
+              {{ book.name }}
+            </router-link>
+            </span>
             <span class="description">{{ book.description }}</span>
           </div>
         </div>
@@ -222,22 +238,22 @@ const circleUrl = ref('https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726
                 <span>{{ currentBook.favorites }}</span> 收藏
               </p>
               <p class="description">{{ currentBook.description }}</p>
-              <el-button plain round color="#19bad8">书籍详情</el-button>
+              <el-button plain round color="#19bad8" @click="toBookDetail(currentBook.id)">书籍详情</el-button>
             </div>
           </div>
           <div class="grid">
             <div class="book-card" v-for="book in newBooks.slice(0, 6)" :key="book.title">
               <el-image :src="book.cover" alt="封面" class="img" />
-              <p class="new-book-title">{{ book.title }}</p>
+              <p class="new-book-title"  @click="toBookDetail(book.id)" style="cursor: pointer">{{ book.title }}</p>
               <p class="description">{{ book.description }}</p>
-              <el-avatar :size="20" :src="circleUrl" class="avatar" />
+              <el-avatar :size="18" :src="circleUrl" class="avatar" />
               <p class="author">{{ book.author }}</p>
             </div>
           </div>
         </div>
       </div>
       <div class="ranking">
-        <RankList title="新书榜" type="1" :books="sellingRank" :img="sellingImg"></RankList>
+        <RankList title="新书榜" name="newBook" type="1" :books="sellingRank" :img="sellingImg"></RankList>
       </div>
     </div>
 
@@ -266,13 +282,13 @@ const circleUrl = ref('https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726
                 <span>{{ sellingCurrentBook.favorites }}</span> 收藏
               </p>
               <p class="description">{{sellingCurrentBook.description }}</p>
-              <el-button plain round color="#19bad8">书籍详情</el-button>
+              <el-button plain round color="#19bad8"  @click="toBookDetail(sellingCurrentBook.id)">书籍详情</el-button>
             </div>
           </div>
           <div class="grid">
             <div class="book-card" v-for="book in sellingBooks.slice(0, 6)" :key="book.title">
               <el-image :src="book.cover" alt="封面" class="img" />
-              <p class="new-book-title">{{ book.title }}</p>
+              <p class="new-book-title"  @click="toBookDetail(book.id)" style="cursor: pointer">{{ book.title }}</p>
               <p class="description">{{ book.description }}</p>
               <el-avatar :size="20" :src="circleUrl" class="avatar" />
               <p class="author">{{ book.author }}</p>
@@ -283,7 +299,7 @@ const circleUrl = ref('https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726
       <div class="ranking">
         <!--      畅销榜(这个月得到的订阅点数排行)-->
         <div class="selling">
-          <RankList title="畅销榜" type="1" :books="sellingRank" :img="sellingImg"></RankList>
+          <RankList title="畅销榜" name="selling" type="1" :books="sellingRank" :img="sellingImg"></RankList>
         </div>
       </div>
     </div>
@@ -304,7 +320,7 @@ const circleUrl = ref('https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726
         </div>
       </div>
       <div class="pass">
-        <RankList title="月票榜" type="0" :books="passRank" :img="sellingImg"></RankList>
+        <RankList name="pass" title="月票榜" type="0" :books="passRank" :img="sellingImg"></RankList>
       </div>
     </div>
 
@@ -325,38 +341,40 @@ const circleUrl = ref('https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726
     font-family: '华文行楷', serif;
     font-weight: 300;
     float: left;
+    margin-left: 20px;
+    margin-top: 35px;
   }
 
-  .search {
+  .search{
     height: 40px;
     font-size: 15px;
     float: left;
     border: 1px solid #ccc;
     border-radius: 20px;
-    width: 380px;
-    margin-left: 100px;
+    width: 400px;
+    margin-left: 120px;
     margin-top: 35px;
-
-    input {
-      margin-top: 12px;
-      margin-left: 12px;
+    padding-bottom: 2px;
+    input{
+      margin-bottom: 5px;
+      margin-left: 14px;
       border: none;
       outline: none;
-      width: 305px;
+      width: 312px;
+      font-size: 15px;
     }
-
-    button {
-      height: 41px;
+    button{
+      width: 70px;
+      height: 42px;
       padding: 0 15px;
       border: none;
       background-color: #19bad8;
       color: white;
       border-left: 1px solid #ccc;
-      font-size: 14px;
+      font-size: 16px;
       border-radius: 0 20px 20px 0;
     }
-
-    button:hover {
+    button:hover{
       opacity: 0.8;
     }
   }
@@ -370,6 +388,11 @@ const circleUrl = ref('https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726
     gap: 18px;
     align-items: center;
     margin: 20px 0;
+
+    a{
+      text-decoration: none;
+      color: black;
+    }
   }
 
   .category {
@@ -481,6 +504,11 @@ const circleUrl = ref('https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726
           overflow: hidden; /* 隐藏超出部分 */
           white-space: nowrap; /* 不换行 */
           text-overflow: ellipsis; /* 使用省略号表示溢出部分 */
+
+          a{
+            text-decoration: none;
+            color: black;
+          }
         }
 
         .description {
@@ -525,12 +553,20 @@ const circleUrl = ref('https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726
           margin-bottom: 5px;
           display: inline-block;
           width: 300px;
+
+          a{
+            text-decoration: none;
+            color: black;
+          }
+          a:hover{
+            color: #ed0b38;
+          }
         }
 
         .description {
           display: inline-block;
           color: #878585;
-          font-size: 14px;
+          font-size: 13px;
           width: 250px;
           overflow: hidden; /* 隐藏超出部分 */
           white-space: nowrap; /* 不换行 */
@@ -641,7 +677,7 @@ const circleUrl = ref('https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726
         float: left;
         width: 500px;
         padding-left: 10px;
-
+        margin-top: -10px;
         .book-card {
           position: relative;
           width: 240px;
@@ -704,8 +740,8 @@ const circleUrl = ref('https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726
   }
 
   .rank {
-    float: left;
-    margin-top: 5px;
+    float: right;
+    margin-top: 4px;
   }
 }
 .new-channel{
