@@ -9,7 +9,7 @@
 
 项目演示视频:
 
-[https://www.youtube.com/embed/your-video-id](https://www.bilibili.com/video/BV1Ke6nYkEUR?t=98.2)
+https://www.bilibili.com/video/BV1Ke6nYkEUR?t=98.2
 
 
 ### 主页
