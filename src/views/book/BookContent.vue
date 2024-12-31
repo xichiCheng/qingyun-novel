@@ -5,8 +5,9 @@ import CatalogDialog from '@/views/book/components/CatalogDialog.vue'
 import { ArrowLeftBold, ArrowRightBold } from '@element-plus/icons-vue'
 import { useRouter } from 'vue-router'
 import { ElButton, ElDialog, ElRadioGroup } from 'element-plus'
+import { useUserStore } from '@/stores/index.js'
 
-// 获取路由实例
+const userStore = useUserStore()
 const router = useRouter()
 const isCatalogDialogVisible = ref(false)
 
@@ -35,7 +36,7 @@ const novel = reactive({
   wordCount: '100万',
 })
 
-const currentChapter = reactive({
+const currentChapter = ref({
   number: 1,
   title: '南阳公主',
   content:
@@ -65,7 +66,7 @@ const currentChapter = reactive({
 })
 
 const formattedContent = computed(() => {
-  return currentChapter.content
+  return currentChapter.value.content
     .split('\n') // 按换行符分割
     .map((line) => `&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;${line}`) // 每行前添加两个空格
     .join('<br><br>') // 使用 <br> 进行换行
@@ -82,10 +83,9 @@ const openSettingsDialog = () => {
   settingIsVisible.value = true
 }
 const themeColors = ['#eaeaea', '#e6e1d6', '#c8dfca', '#cedde1', '#0a0a0a'] // 可选的主题颜色
-const contentColors = ['#f3f3f3','#f5f1e8','#ddebde','#dae9ed','#111111']
+const contentColors = ['#f3f3f3', '#f5f1e8', '#ddebde', '#dae9ed', '#111111']
 
-
-const themeColor = ref(themeColors[1]); // 默认背景色
+const themeColor = ref(themeColors[1]) // 默认背景色
 const contentColor = ref(contentColors[1])
 
 const fontColor = ref('black')
@@ -93,12 +93,10 @@ const size = ref(18)
 const fontSize = ref('18px') // 默认字体大小
 const fontStyle = ref('微软雅黑')
 // 修改阅读主题
-
 const changeTheme = (index) => {
   console.log(index)
-  if(index===4)
-    fontColor.value = '#ffffff'
-  else{
+  if (index === 4) fontColor.value = '#ffffff'
+  else {
     fontColor.value = 'black'
   }
 
@@ -113,13 +111,56 @@ const changeFontSize = (action) => {
   }
   fontSize.value = size.value + 'px'
 }
+
+//投票
+const ticketDialog = ref(false)
+const activeTab = ref('month') // 当前选中的标签页
+const selectedPass= ref(0) // 当前选中的票数
+const selectedRecommend = ref(0)
+
+// 模拟用户余票
+const passTickets = ref(userStore.user.passTickets) // 月票余票数
+const recommendTickets = ref(userStore.user.recommendTickets) // 推荐票余票数
+
+// 票数选项
+const ticketOptions = [1, 2, 3, 4, 5, 6, 7, 8]
+
+// 选择票数
+const selectVotes = (type, num) => {
+  if (
+    (type === 'pass' && num > passTickets.value) ||
+    (type === 'recommended' && num > recommendTickets.value)
+  ) {
+    return // 票数超过余票时不操作
+  }
+  if(type==='pass'){
+    selectedPass.value = num
+  }
+  if(type === 'recommended') {
+    selectedRecommend.value = num
+  }
+}
+
+// 提交投票
+const submitVote = (type) => {
+  if (type === 'pass') {
+    passTickets.value -= selectedPass.value // 扣减余票
+    selectedPass.value = 0
+  } else if (type === 'recommend') {
+    recommendTickets.value -= selectedRecommend.value // 扣减余票
+    selectedRecommend.value = 0
+  }
+  ticketDialog.value = false // 关闭对话框
+}
 </script>
 <template>
-  <div class="main" :style="{ backgroundColor: themeColor}">
+  <div class="main" :style="{ backgroundColor: themeColor }">
     <div class="novel-content-page">
       <!-- 内容区 -->
-      <div class="content-main w" :style="{ backgroundColor: contentColor}">
-        <h2 class="chapter-title" :style="{ color: fontColor }">第一章 {{ currentChapter.title }}</h2>
+      <div class="content-main w" :style="{ backgroundColor: contentColor }">
+        <h2 class="chapter-title" :style="{ color: fontColor }">
+          第一章 {{ currentChapter.title }}
+        </h2>
         <!-- 添加书籍相关信息 -->
         <div class="chapter-info" :style="{ color: fontColor }">
           <p>
@@ -148,7 +189,10 @@ const changeFontSize = (action) => {
           </p>
         </div>
         <div class="chapter-content">
-          <pre :style="{ color: fontColor , fontSize: fontSize , fontFamily: fontStyle}" v-html="formattedContent"></pre>
+          <pre
+            :style="{ color: fontColor, fontSize: fontSize, fontFamily: fontStyle }"
+            v-html="formattedContent"
+          ></pre>
         </div>
       </div>
 
@@ -156,7 +200,11 @@ const changeFontSize = (action) => {
         <el-affix class="side-affix">
           <div class="sidebar">
             <!-- 目录 -->
-            <span class="sidebar-section" :style="{ backgroundColor: contentColor}" @click="openCatalogDialog">
+            <span
+              class="sidebar-section"
+              :style="{ backgroundColor: contentColor }"
+              @click="openCatalogDialog"
+            >
               <svg class="icon chapterIcon" aria-hidden="true">
                 <use xlink:href="#icon-yueduye-mulu"></use>
               </svg>
@@ -164,7 +212,11 @@ const changeFontSize = (action) => {
             </span>
 
             <!-- 书详情 -->
-            <span class="sidebar-section detail" :style="{ backgroundColor: contentColor}" @click="goToBookDetail(bookId)">
+            <span
+              class="sidebar-section detail"
+              :style="{ backgroundColor: contentColor }"
+              @click="goToBookDetail(bookId)"
+            >
               <svg class="icon chapterIcon" aria-hidden="true">
                 <use xlink:href="#icon-shu"></use>
               </svg>
@@ -172,15 +224,32 @@ const changeFontSize = (action) => {
             </span>
 
             <!-- 加书架 -->
-            <span class="sidebar-section bookshelf" :style="{ backgroundColor: contentColor}">
-              <svg class="icon chapterIcon" aria-hidden="true">
+            <span class="sidebar-section bookshelf" :style="{ backgroundColor: contentColor }">
+              <svg
+                v-if="!userStore.getBookById(Number(props.bookId))"
+                class="icon chapterIcon"
+                aria-hidden="true"
+              >
                 <use xlink:href="#icon-jiarushujia"></use>
               </svg>
-              <span>加入书架</span>
+              <svg
+                v-if="userStore.getBookById(Number(props.bookId))"
+                class="icon chapterIcon"
+                aria-hidden="true"
+              >
+                <use xlink:href="#icon-yijiarushujia"></use>
+              </svg>
+              <span>{{
+                userStore.getBookById(Number(props.bookId)) ? '已在书架' : '加入书架'
+              }}</span>
             </span>
 
             <!-- 投票 -->
-            <span class="sidebar-section" :style="{ backgroundColor: contentColor}">
+            <span
+              class="sidebar-section"
+              :style="{ backgroundColor: contentColor }"
+              @click="ticketDialog = true"
+            >
               <svg class="icon chapterIcon" aria-hidden="true">
                 <use xlink:href="#icon-toupiao"></use>
               </svg>
@@ -188,19 +257,23 @@ const changeFontSize = (action) => {
             </span>
 
             <!-- 上一章 -->
-            <span class="sidebar-section" :style="{ backgroundColor: contentColor}">
+            <span class="sidebar-section" :style="{ backgroundColor: contentColor }">
               <el-icon size="30" class="chapterIcon"><ArrowLeftBold /></el-icon>
               <span class="last-chapter">上一章</span>
             </span>
 
             <!-- 下一章 -->
-            <span class="sidebar-section" :style="{ backgroundColor: contentColor}">
+            <span class="sidebar-section" :style="{ backgroundColor: contentColor }">
               <el-icon size="30" class="chapterIcon"><ArrowRightBold /></el-icon>
               <span class="next-chapter">下一章</span>
             </span>
 
             <!-- 设置 -->
-            <span class="sidebar-section" :style="{ backgroundColor: contentColor}" @click="openSettingsDialog">
+            <span
+              class="sidebar-section"
+              :style="{ backgroundColor: contentColor }"
+              @click="openSettingsDialog"
+            >
               <svg class="icon chapterIcon" aria-hidden="true">
                 <use xlink:href="#icon-shezhi"></use>
               </svg>
@@ -218,7 +291,13 @@ const changeFontSize = (action) => {
         />
       </div>
       <div class="setting-dialog">
-        <el-dialog title="设置" v-model="settingIsVisible" width="450px" top="240px" style="margin-left: 720px">
+        <el-dialog
+          title="设置"
+          v-model="settingIsVisible"
+          width="450px"
+          top="240px"
+          style="margin-left: 720px"
+        >
           <div class="settings-content">
             <!-- 阅读主题 -->
             <div class="setting-item">
@@ -240,14 +319,14 @@ const changeFontSize = (action) => {
               <div class="font">
                 <el-radio-group v-model="fontStyle">
                   <el-radio-button label="黑体" style="font-family: '微软雅黑', 'serif'"
-                    >黑体</el-radio-button
-                  >
+                    >黑体
+                  </el-radio-button>
                   <el-radio-button label="仿宋" style="font-family: '宋体', 'serif'"
-                    >宋体</el-radio-button
-                  >
+                    >宋体
+                  </el-radio-button>
                   <el-radio-button label="楷体" style="font-family: '楷体', 'serif'"
-                    >楷体</el-radio-button
-                  >
+                    >楷体
+                  </el-radio-button>
                 </el-radio-group>
               </div>
             </div>
@@ -264,13 +343,72 @@ const changeFontSize = (action) => {
           </div>
         </el-dialog>
       </div>
+      <div class="ticket-dialog">
+        <el-dialog :style="{ backgroundColor: contentColor }" v-model="ticketDialog" width="500px">
+          <div class="ticket-content">
+            <el-tabs v-model="activeTab">
+              <!-- 投月票 -->
+              <el-tab-pane label="投月票" name="month">
+                <div class="ticket-container">
+                <span
+                  v-for="num in ticketOptions"
+                  :key="'month-' + num"
+                  :class="[
+                    'ticket',
+                    { disabled: num > passTickets, active: selectedPass === num },
+                  ]"
+                  @click="selectVotes('pass', num)"
+                >
+                  {{  num }}张
+                </span>
+                  <span class="ticket" :class="{ active: selectedPass === passTickets&&selectedPass!==0 }" @click="selectVotes('pass',passTickets)">全部</span>
+                </div>
+                <div class="footer">
+                  <span>余票 <span style="color: #ed0b38">{{ passTickets }}</span> 张</span>
+                  <el-button class="but" type="primary" :disabled="!selectedPass" @click="submitVote('pass')">
+                    投票
+                  </el-button>
+                </div>
+              </el-tab-pane>
+
+              <!-- 投推荐票 -->
+              <el-tab-pane label="投推荐票" name="recommend">
+                <div class="ticket-container">
+                <span
+                  v-for="num in ticketOptions"
+                  :key="'recommend-' + num"
+                  :class="[
+                    'ticket',
+                    { disabled: num > recommendTickets, active: selectedRecommend === num },
+                  ]"
+                  @click="selectVotes('recommended', num)"
+                >
+                  {{ num }}
+                </span>
+                  <span class="ticket" :class="{ active: selectedRecommend === recommendTickets&&selectedRecommend!==0 }" @click="selectVotes('recommended',recommendTickets)">全部</span>
+                </div>
+                <div class="footer">
+                  <span>余票 <span style="color: #ed0b38">{{ recommendTickets }}</span> 张</span>
+                  <el-button
+                    class="but"
+                    type="primary"
+                    :disabled="!selectedRecommend"
+                    @click="submitVote('recommend')"
+                  >
+                    投票
+                  </el-button>
+                </div>
+              </el-tab-pane>
+            </el-tabs>
+          </div>
+        </el-dialog>
+      </div>
     </div>
   </div>
 </template>
 
 <style scoped lang="scss">
 .main {
-
   margin: -7px;
 }
 
@@ -434,6 +572,69 @@ const changeFontSize = (action) => {
 
   .el-slider {
     width: 100%;
+  }
+}
+
+.ticket-dialog {
+  .ticket-container {
+    height: 300px;
+    display: flex;
+    gap: 5px;
+    flex-wrap: wrap;
+    margin: 10px 0 20px 20px;
+  }
+
+  .ticket {
+    box-sizing: border-box;
+    width: 130px;
+    margin: 5px 5px;
+    height: 70px;
+    border-radius: 8px;
+    cursor: pointer;
+    user-select: none;
+    transition: all 0.2s;
+    background-color: #faf9f4;
+    align-content: center;
+    line-height: 70px;
+    padding-left: 50px;
+    font-size: 20px;
+    font-weight: bold;
+    color: black;
+  }
+
+  .ticket.active {
+    background-color: #f3d3cd;
+    border: 1px solid #ed0b38;
+    color: #ed0b38;
+  }
+
+  .ticket.disabled {
+    color: #ccc;
+    border-color: #ccc;
+    cursor: not-allowed;
+    pointer-events: none;
+  }
+
+  .footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 20px;
+    margin-left: 20px;
+    font-size: 18px;
+    color: black;
+    font-weight: bold;
+
+    .but{
+      width: 80px;
+      height: 40px;
+      background-color: #ed0b38;
+      color: white;
+      margin-right: 25px;
+      font-weight: bold;
+      font-size: 16px;
+      border: none;
+    }
   }
 }
 </style>

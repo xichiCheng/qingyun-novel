@@ -13,7 +13,6 @@ const openLoginDialog = () => {
 
 const store = useUserStore()
 const isLoggedIn = ref(store.token !== '')
-const username = ref(store.user.username || '')
 
 const logout = async () => {
    await ElMessageBox.confirm('你确认要进行退出么', '温馨提示', {

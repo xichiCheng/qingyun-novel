@@ -8,6 +8,7 @@ const props = defineProps({
   type: String,
   books: Array,
   img: String,
+  categoryId: Number
 })
 
 const func = () => {
@@ -22,6 +23,9 @@ const func = () => {
     window.open(newRoute.href, '_blank')
   } else if (props.name === 'newBook') {
     const newRoute = router.resolve({ name: 'NewRank' })
+    window.open(newRoute.href, '_blank')
+  } else if (props.name === 'collection') {
+    const newRoute = router.resolve({ name: 'CollectionRank' })
     window.open(newRoute.href, '_blank')
   }
 }
@@ -50,7 +54,7 @@ const func = () => {
       <span v-else-if="type === '3'" class="number">{{ books[0].number }}<span>收藏</span></span>
       <span class="introduced"> {{ books[0].type }} · {{ books[0].author }} </span>
       <span class="img">
-        <el-image :src="img"></el-image>
+        <img :src="img" style="height: 100px;width: 70px;" alt="封面" />
       </span>
     </div>
     <div class="remaining">

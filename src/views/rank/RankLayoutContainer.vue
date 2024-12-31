@@ -34,10 +34,9 @@ onBeforeUnmount(() => {
             <el-divider content-position="left">热门作品排行</el-divider>
             <el-menu-item index="/rank/pass">月票榜</el-menu-item>
             <el-menu-item index="/rank/selling">畅销榜</el-menu-item>
-            <el-menu-item index="/rank/new">新书热销榜</el-menu-item>
+            <el-menu-item index="/rank/new">新书榜</el-menu-item>
             <el-menu-item index="/rank/recommend">推荐榜</el-menu-item>
             <el-menu-item index="/rank/collection">收藏榜</el-menu-item>
-            <el-menu-item index="/rank/words">总字数榜</el-menu-item>
           </el-menu>
         </el-aside>
         <el-main>

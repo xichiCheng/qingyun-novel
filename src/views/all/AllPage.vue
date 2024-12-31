@@ -25,13 +25,14 @@ const params = ref({
   subCategoryId: Number(route.value.query.subCategoryId) || 0, // 子分类
   status: Number(route.value.query.status) || 0 ,
   attribute: Number(route.value.query.attribute) || 0, // 属性
-  wordRange: '', // 字数范围
+  wordRange: 0, // 字数范围
   tags: [], // 标签数组
   pageNum: 1, // 当前页码
   pageSize: 10, // 每页条数
 })
 
 const total = ref(0)
+
 //处理分页
 const onSizeChange = (size) => {
   params.value.pagenum = 1
@@ -96,14 +97,14 @@ books.value = books.value.map((book) => ({
 }))
 
 const words = ref([
-  { id: 0, range: '30万字以下' },
-  { id: 1, range: '30万-50万字' },
-  { id: 2, range: '50万-100万字' },
+  { id: 1, range: '30万字以下' },
+  { id: 2, range: '30万-50万字' },
+  { id: 3, range: '50万-100万字' },
   {
-    id: 3,
+    id: 4,
     range: '100万字-200万字',
   },
-  { id: 4, range: '200万字以上' },
+  { id: 5, range: '200万字以上' },
 ])
 
 const tags = ref([
@@ -252,6 +253,10 @@ const toggleTag = (tagId) => {
   console.log(selectedTags)
 }
 
+const toBook = (id) => {
+  const newRoute = router.resolve({ name: 'BookDetail',params: { id: id } });
+  window.open(newRoute.href, '_blank');
+}
 //固定
 const showAffix = ref(false)
 const handleScroll = () => {
@@ -306,28 +311,25 @@ onBeforeUnmount(() => {
         <div class="filter-status">
           <span class="title">状态：</span>
           <div class="status">
-            <el-radio-group v-model="params.status">
-              <el-radio-button :label="0"><span>全部</span></el-radio-button>
-              <el-radio-button :label="1"><span>连载中</span></el-radio-button>
-              <el-radio-button :label="2"><span>已完结</span></el-radio-button>
-            </el-radio-group>
+            <span class="status-item" @click="params.status = 0" :class="{ 'active': params.status === 0 }">全部</span>
+            <span class="status-item" @click="params.status = 1" :class="{ 'active': params.status === 1 }">连载中</span>
+            <span class="status-item" @click="params.status = 2" :class="{ 'active': params.status === 2 }">已完结</span>
           </div>
         </div>
+
         <div class="filter-attribute">
           <span class="title">属性：</span>
-          <div class="status">
-            <el-radio-group v-model="params.attribute">
-              <el-radio-button :label="0"><span>全部</span></el-radio-button>
-              <el-radio-button :label="1"><span>免费</span></el-radio-button>
-              <el-radio-button :label="2"><span>VIP</span></el-radio-button>
-            </el-radio-group>
+          <div class="attribute">
+            <span class="attribute-item" @click="params.attribute = 0" :class="{ 'active': params.attribute === 0 }">全部</span>
+            <span class="attribute-item" @click="params.attribute = 1" :class="{ 'active': params.attribute === 1 }">免费</span>
+            <span class="attribute-item" @click="params.attribute = 2" :class="{ 'active': params.attribute === 2 }">VIP</span>
           </div>
         </div>
         <div class="filter-words">
           <span class="title">字数：</span>
           <div class="words">
-            <span class="word-item">全部</span>
-            <span v-for="word in words" :key="word.id" class="word-item">
+            <span class="word-item"  @click="params.wordRange=0" :class="{'active': params.wordRange === 0 }">全部</span>
+            <span v-for="word in words" @click="params.wordRange=word.id" :class="{'active': params.wordRange === word.id }" :key="word.id" class="word-item">
               {{ word.range }}
             </span>
           </div>
@@ -415,7 +417,7 @@ onBeforeUnmount(() => {
           <!-- 小说列表 -->
           <div class="book-card" v-for="book in filteredBooks" :key="book.id">
             <img :src="book.cover" alt="书籍封面" class="book-cover" />
-            <p class="name">{{ book.title }}</p>
+            <p class="name" @click="toBook(book.id)" style="cursor: pointer">{{ book.title }}</p>
             <p class="author">
               <el-avatar :size="12" :src="circleUrl" />
               {{ book.author }} | {{ book.category }}·{{ book.secondary_category }} |
@@ -431,7 +433,7 @@ onBeforeUnmount(() => {
             v-model:current-page="params.pageNum"
             v-model:page-size="params.pageSize"
             :page-sizes="[10, 20, 30, 40]"
-            layout="total, sizes,prev, pager, next, jumper"
+            layout="total, prev, pager, next, jumper"
             background
             :total="total"
             @size-change="onSizeChange"
@@ -525,9 +527,18 @@ onBeforeUnmount(() => {
     .status {
       margin-top: 15px;
 
-      span {
+      .status-item {
+        cursor: pointer;
+        display: inline-block;
+        width: 50px;
+        height: 30px;
         font-size: 13px;
+        line-height: 30px;
+        text-align: center;
+        margin-left: 5px;
+        border-radius: 8px;
       }
+
     }
   }
 
@@ -536,12 +547,21 @@ onBeforeUnmount(() => {
     padding-bottom: 15px;
     border-bottom: 1px solid #cccccc;
 
-    .status {
+    .attribute {
       margin-top: 15px;
 
-      span {
+      .attribute-item {
+        cursor: pointer;
+        display: inline-block;
+        width: 50px;
+        height: 30px;
         font-size: 13px;
+        line-height: 30px;
+        text-align: center;
+        margin-left: 5px;
+        border-radius: 8px;
       }
+
     }
   }
 
@@ -554,21 +574,25 @@ onBeforeUnmount(() => {
       margin-top: 10px;
 
       .word-item {
+        cursor: pointer;
         display: inline-block;
-        width: 115px;
+        width: 100px;
         height: 30px;
         font-size: 13px;
         line-height: 30px;
         text-align: center;
-      }
-
-      .word-item:hover {
-        background-color: #f5f5f5;
+        margin-left: 10px;
         border-radius: 8px;
       }
-    }
-  }
 
+    }
+
+
+  }
+  .active{
+    background-color: #ed0b38;
+    color: white;
+  }
   .filter-tag {
     margin-top: 10px;
     margin-bottom: 40px;
@@ -656,7 +680,9 @@ onBeforeUnmount(() => {
         left: 130px;
         font-size: 18px;
       }
-
+      .name:hover{
+        color: #ed0b38;
+      }
       .author {
         position: absolute;
         left: 130px;
@@ -693,7 +719,7 @@ onBeforeUnmount(() => {
 
       .collection {
         position: absolute;
-        left: 234px;
+        left: 225px;
         top: 115px;
         font-size: 13px;
         color: #c6012a;

@@ -4,10 +4,13 @@ import { ref } from 'vue'
 import { computed } from 'vue'
 import ComAffix from '@/components/ComAffix.vue'
 import { ArrowDownBold, ArrowRight, ArrowUpBold, Lock } from '@element-plus/icons-vue'
-import { useRouter } from 'vue-router';
+import { useRouter } from 'vue-router'
+import { useUserStore } from '@/stores/index.js'
+import { useCategoryStore } from '@/stores/index.js'
 // 获取路由实例
-const router = useRouter();
-
+const router = useRouter()
+const userStore = useUserStore()
+const categoryStore = useCategoryStore()
 const props = defineProps({
   id: {
     type: String,
@@ -19,9 +22,12 @@ const novel = reactive({
   id: 1,
   cover_url:
     'https://chen-novel.oss-cn-hangzhou.aliyuncs.com/novel/64F862A28B12F6D181DD8BC68594ED76.jpg',
-  title: '天命在汉',
+  name: '天命兴汉',
   author: '微兮凉',
-  category: '古代言情',
+  categoryId: 1,
+  subcategoryId: 6,
+  status: 1,
+  attribute:2,
   wordCount: '101万',
   recommendCount: '51341',
   favoriteCount: '32201',
@@ -53,7 +59,8 @@ const author = reactive({
 
 // 功能方法
 const addToBookshelf = () => {
-  console.log('加入书架')
+  if(userStore.token==='')
+    router.push('/login')
 }
 
 const chapters = reactive({
@@ -100,9 +107,13 @@ const goToBookContent = (bookId, chapterId) => {
       <!-- 面包屑 -->
       <el-breadcrumb separator="/" class="breadcrumb">
         <el-breadcrumb-item to="/">首页</el-breadcrumb-item>
-        <el-breadcrumb-item to="/category/modern-romance">古代言情</el-breadcrumb-item>
-        <el-breadcrumb-item to="/category/modern-romance">穿越奇缘</el-breadcrumb-item>
-        <el-breadcrumb-item>{{ novel.title }}</el-breadcrumb-item>
+        <el-breadcrumb-item :to="{ name: 'Category', params: { id: novel.categoryId} }" target="_blank">
+          {{categoryStore.getCategory(novel.categoryId).name}}
+        </el-breadcrumb-item>
+        <el-breadcrumb-item
+          :to="{ name: 'All', query: { categoryId: novel.categoryId, subCategoryId: novel.subcategoryId } }"
+        >{{categoryStore.getSubCategory(novel.categoryId,novel.subcategoryId).name}}</el-breadcrumb-item>
+        <el-breadcrumb-item>{{ novel.name }}</el-breadcrumb-item>
       </el-breadcrumb>
 
       <!-- 小说详情卡片 -->
@@ -113,9 +124,13 @@ const goToBookContent = (bookId, chapterId) => {
 
           <!-- 小说信息 -->
           <div class="novel-info">
-            <h1 class="name">{{ novel.title }}</h1>
+            <h1 class="name">{{ novel.name }}</h1>
             <p class="author">作者: {{ novel.author }}</p>
-            <p class="category">连载中 · {{ novel.category }} · 穿越奇缘</p>
+            <p class="category">
+              {{novel.status===1 ? '连载中' : '已完结'}} ·
+              {{novel.attribute===1 ? '免费' : 'VIP'}} ·
+              {{categoryStore.getCategory(novel.categoryId).name}} ·
+              {{categoryStore.getSubCategory(novel.categoryId,novel.subcategoryId).name}}</p>
             <p class="info">
               <span> {{ novel.wordCount }}</span> 字 &nbsp;&nbsp;&nbsp;&nbsp;<span>{{
                 novel.recommendCount
@@ -123,8 +138,8 @@ const goToBookContent = (bookId, chapterId) => {
               推荐 &nbsp;&nbsp;&nbsp;&nbsp;<span>{{ novel.favoriteCount }} </span> 收藏
             </p>
             <div class="actions">
-              <el-button round plain color="#19bad8" @click="addToBookshelf" class="bookshelf"
-                >加入书架
+              <el-button round plain color="#19bad8" @click="addToBookshelf" class="bookshelf" :disabled="userStore.getBookById(Number(props.id))"
+                >{{ userStore.getBookById(Number(props.id)) ? '已在书架' : '加入书架' }}
               </el-button>
               <el-button
                 round
@@ -176,7 +191,7 @@ const goToBookContent = (bookId, chapterId) => {
         </template>
         <div class="catalog-list">
           <span v-for="(chapter, index) in displayedChapters" :key="index" class="catalog-item">
-            <span>第{{ chapter.number }}章 &nbsp;{{ chapter.title }}</span>
+            <span  @click="goToBookContent(props.id,chapter.number)" style="cursor: pointer">第{{ chapter.number }}章 &nbsp;{{ chapter.title }}</span>
             <i v-if="chapter.isPaid">
               <el-icon color="#aeacac"><Lock /></el-icon>
             </i>
@@ -198,14 +213,12 @@ const goToBookContent = (bookId, chapterId) => {
       <el-card class="comments-card">
         <template #header>
           <span class="title">评论区</span>
-          <el-link class="comments-link" @click="goToAllComments" :underline="false">
+          <router-link class="comments-link" :to="{ name: 'Comment', query: { bookId: props.id, bookName: novel.name } }" target="_blank">
             全部评论&nbsp;
-            <template #icon>
-              <el-icon>
+            <el-icon class="icon">
                 <ArrowRight />
-              </el-icon>
-            </template>
-          </el-link>
+            </el-icon>
+          </router-link>
         </template>
         <div
           class="comment-item"
@@ -226,7 +239,7 @@ const goToBookContent = (bookId, chapterId) => {
 
 <style scoped lang="scss">
 .w {
-  width: 1000px;
+  width: 900px;
   margin: 0 auto;
 }
 
@@ -363,7 +376,7 @@ const goToBookContent = (bookId, chapterId) => {
 
     .profile {
       margin-left: 30px;
-      width: 900px;
+      width: 800px;
       white-space: pre-wrap;
       word-wrap: break-word;
       font-size: 15px;
@@ -402,12 +415,12 @@ const goToBookContent = (bookId, chapterId) => {
 
   .catalog-item {
     display: inline-block;
-    width: 300px;
+    width: 270px;
     height: 40px;
 
     span {
       display: inline-block;
-      width: 260px;
+      width: 220px;
       overflow: hidden; /* 隐藏超出部分 */
       white-space: nowrap; /* 不换行 */
       text-overflow: ellipsis; /* 使用省略号表示溢出部分 */
@@ -415,7 +428,7 @@ const goToBookContent = (bookId, chapterId) => {
   }
 
   .expand-icon {
-    margin-left: 450px;
+    margin-left: 400px;
   }
 }
 
@@ -429,13 +442,21 @@ const goToBookContent = (bookId, chapterId) => {
     font-weight: bold;
   }
 
+  a{
+    color: black;
+    text-decoration: none;
+  }
+
+  a:hover {
+    color: #ed0b38;
+  }
   .comments-link {
-    margin-left: 700px;
+    margin-left: 600px;
     font-size: 18px;
   }
 
   .comment-item {
-    padding-left: 30px;
+    padding: 0 30px;
     border-bottom: 1px solid #dcd7d7;
 
     .comment-header {

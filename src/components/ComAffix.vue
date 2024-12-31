@@ -53,7 +53,7 @@ const logout = async () => {
   userStore.removeToken()
   userStore.setUser({})
   isLoggedIn.value = false;
-  router.push('/')
+  router.back()
 }
 
 </script>

@@ -64,8 +64,7 @@ const handleLogin = () => {
   userStore.setUser(user)
   ElMessage.success("登录成功！");
 
-  router.push('/');
-
+  router.back()
 };
 </script>
 <template>

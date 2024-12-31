@@ -16,10 +16,18 @@ export const useUserStore = defineStore(
       console.log(res)
       user.value = res.data.data
     }
+    const getBookById =  (id) => {
+      console.log(id)
+      const books = user.value.books
+      if(!books) return null
+      const book = books.find((book) => book.id === id) // 找到对应的一级分类
+      console.log(book)
+      return book || null
+    }
     const setUser = (obj) => {
       user.value = obj
     }
-    return { token, user, setToken, removeToken, getUser,setUser}
+    return { token, user, setToken, removeToken, getUser,setUser,getBookById}
   },
   {
     persist: true // 持久化

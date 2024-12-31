@@ -1,30 +1,25 @@
 <script setup>
-import { ref } from 'vue'
+import { ref,computed } from 'vue'
 import RankBooks from '@/views/rank/components/RankBooks.vue'
+import {useCategoryStore} from '@/stores/index.js'
+const categoryStore = useCategoryStore()
+import router from '@/router/index.js'
+const route = computed(() => router.currentRoute.value);
 
-const categories = ref([
-  { id: 1, name: '古代言情' },
-  { id: 2, name: '仙侠奇缘' },
-  { id: 3, name: '现代言情' },
-  { id: 4, name: '浪漫青春' },
-  { id: 5, name: '玄幻言情' },
-  { id: 6, name: '悬疑推理' },
-  { id: 7, name: '科幻空间' },
-  { id: 8, name: '游戏竞技' },
-  { id: 9, name: '衍生同人' },
-  { id: 10, name: '现实生活' },
-])
+const categoryId = ref(route.value.query.id || 0)
+
+const categories = categoryStore.getCategories()
 const rankBook = ref(
   Array.from({ length: 20 }, (_, i) => ({
     id: i,
     title: '喜欢你我说了算',
     author: '叶非夜',
     wordCount: 603000,
-    category: '现代言情',
-    secondary_category: '豪门世家',
+    categoryId: 3,
+    subcategoryId: 12,
     cover:
       'https://chen-novel.oss-cn-hangzhou.aliyuncs.com/novel/600.webp',
-    status: 'complet',
+    status: 1,
     profile:
       '林薇：我要上清华。\n' +
       '江宿：我就不一样了。\n' +
@@ -43,15 +38,34 @@ const rankBook = ref(
   })),
 )
 
+const choice = ref('week')
+const sortChoice = computed( ()=>{
+  if(choice.value==='week'){
+    return '本周'
+  }else if(choice.value==='month'){
+    return '本月'
+  }else{
+    return '历史总'
+  }
+})
 </script>
 
 <template>
   <div class="main">
-    <div class="title">推荐榜</div>
-
+    <div class="title">推荐榜 <span>{{sortChoice}}作品推荐票数排行</span></div>
+    <div class="sort">
+      <span @click="choice='week'" :class="{'active':choice ==='week'}">周榜</span>
+      <span @click="choice='month'" :class="{'active':choice ==='month'}">月榜</span>
+      <span @click="choice='all'" :class="{'active':choice ==='all'}">总榜</span>
+    </div>
     <div class="category">
-      <span>全部分类</span>
-      <span v-for="category in categories" :key="category.id">
+      <span :class="{'active': categoryId===0}" @click="categoryId = Number(0)">全部分类</span>
+      <span
+        v-for="category in categories"
+        :key="category.id"
+        :class="{'active': categoryId===category.id}"
+        @click="categoryId=category.id"
+      >
         {{ category.name }}
       </span>
     </div>
@@ -70,18 +84,51 @@ const rankBook = ref(
   margin-bottom: 20px;
   font-size: 25px;
   font-family: '华文中宋', serif;
+
+  span{
+    font-size: 16px;
+    color: #6c6b6b;
+    margin-left: 10px;
+  }
 }
 
-.category {
+.sort{
+  height: 40px;
+  margin-left: 20px;
+  background-color: #eefcff;
+  line-height: 40px;
+  padding-bottom: 2px;
+  border-bottom: 1px solid #e6e5e5;
+  span{
+    box-sizing: border-box;
+    display: inline-block;
+    width: 60px;
+    padding: 0 15px;
+    cursor: pointer;
+    margin-left: 20px;
+    font-size: 15px;
+  }
+  .active{
+    border-bottom: 2px solid #ed0b38;
+    color: #ed0b38;
+  }
+}
+.category{
   height: 40px;
   margin-bottom: 15px;
   margin-left: 20px;
   background-color: #eefcff;
   line-height: 40px;
 
-  span {
-    margin-right: 18px;
+  span{
+    margin-left: 10px;
+    margin-right: 8px;
     font-size: 13px;
+    cursor: pointer;
+  }
+
+  .active{
+    color: #ed0b38;
   }
 }
 

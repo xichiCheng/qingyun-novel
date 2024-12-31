@@ -50,6 +50,7 @@ const router = createRouter({
     },
     {
       path: '/test',
+      name: 'Test',
       component: ()=> import('@/views/TestPage.vue')
     },
     {
@@ -87,11 +88,6 @@ const router = createRouter({
           path: '/rank/collection',
           name: 'CollectionRank',
           component: () => import('@/views/rank/CollectionRank.vue'),
-        },
-        {
-          path: '/rank/words',
-          name: 'wordsRank',
-          component: () => import('@/views/rank/WordsRank.vue'),
         }
       ],
     },
@@ -139,6 +135,12 @@ const router = createRouter({
         },
       ],
     },
+    {
+      path: '/comment',
+      name: 'Comment',
+      component: ()=> import('@/views/book/BookComment.vue'),
+      props: true
+    }
 
   ],
 })

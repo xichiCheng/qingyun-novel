@@ -104,7 +104,6 @@ const sellingRank = ref(
   })),
 )
 
-const sellingImg = ref('https://chen-novel.oss-cn-hangzhou.aliyuncs.com/novel/6BE3035189D88AB5F7AADDE305A98AD0.jpg')
 
 const activeIndex = ref(0)
 const sellingActiveIndex = ref(0)
@@ -132,8 +131,6 @@ const recentUpdates = ref(
   })),
 )
 
-
-
 const passRank = ref(
   Array.from({ length: 10 }, (_, i) => ({
     id: i,
@@ -141,8 +138,10 @@ const passRank = ref(
     name: '望断归去来',
     type: '衍生同人',
     author: '夕听风云',
+    cover: 'https://chen-novel.oss-cn-hangzhou.aliyuncs.com/novel/6BE3035189D88AB5F7AADDE305A98AD0.jpg'
   })),
 )
+const sellingImg = passRank.value[0].cover
 
 const circleUrl = ref('https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png')
 </script>

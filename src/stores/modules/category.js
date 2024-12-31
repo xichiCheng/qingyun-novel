@@ -31,7 +31,12 @@ export const useCategoryStore = defineStore(
       return [] // 如果没有找到对应的分类，返回空数组
     }
 
-    return { categories, setCategories, getCategories, getCategory, getSubCategories }
+    const getSubCategory = (id,subId) => {
+      const category = categories.value.find((category) => category.id === id)
+      return category.subcategory.find((subcategory) => subcategory.id === subId)
+    }
+
+    return { categories, setCategories, getCategories, getCategory, getSubCategories,getSubCategory }
   },
   {
     persist: true, // 持久化分类信息

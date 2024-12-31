@@ -1,35 +1,30 @@
 <script setup>
-import { ref } from 'vue'
+import { ref ,computed} from 'vue'
+import {useCategoryStore} from '@/stores/index.js'
+const categoryStore = useCategoryStore()
 import RankBooks from '@/views/rank/components/RankBooks.vue'
+import router from '@/router/index.js'
+const route = computed(() => router.currentRoute.value);
+
+const categoryId = ref(route.value.query.id || 0)
 
 const years = ref([2024, 2023, 2022]) // 可扩展年份
 const months = ref([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]) // 月份范围
 const year = ref(null) // 当前选择的年份
 const month = ref(null) // 当前选择的月份
 
-const categories = ref([
-  { id: 1, name: '古代言情' },
-  { id: 2, name: '仙侠奇缘' },
-  { id: 3, name: '现代言情' },
-  { id: 4, name: '浪漫青春' },
-  { id: 5, name: '玄幻言情' },
-  { id: 6, name: '悬疑推理' },
-  { id: 7, name: '科幻空间' },
-  { id: 8, name: '游戏竞技' },
-  { id: 9, name: '衍生同人' },
-  { id: 10, name: '现实生活' },
-])
+const categories = categoryStore.getCategories()
 const rankBook = ref(
   Array.from({ length: 20 }, (_, i) => ({
     id: i,
     title: '喜欢你我说了算',
     author: '叶非夜',
     wordCount: 603000,
-    category: '现代言情',
-    secondary_category: '豪门世家',
+    categoryId: 3,
+    subcategoryId: 12,
     cover:
       'https://chen-novel.oss-cn-hangzhou.aliyuncs.com/novel/600.webp',
-    status: 'complet',
+    status: 1,
     profile:
       '林薇：我要上清华。\n' +
       '江宿：我就不一样了。\n' +
@@ -48,21 +43,11 @@ const rankBook = ref(
   })),
 )
 
-const params = ref({
-  category: 0, // 主分类
-  subCategory: 0, // 子分类
-  status: '', // 状态
-  attribute: '', // 属性
-  wordRange: '', // 字数范围
-  tags: [], // 标签数组
-  pageNum: 1, // 当前页码
-  pageSize: 10, // 每页条数
-})
 </script>
 
 <template>
   <div class="main">
-    <div class="title">月票榜</div>
+    <div class="title">月票榜 <span>以投出月票为排序依据的榜单</span></div>
     <div class="time">
       <div class="year">
         <el-select v-model="year" placeholder="选择年份">
@@ -86,8 +71,13 @@ const params = ref({
       </div>
     </div>
     <div class="category">
-      <span>全部分类</span>
-      <span v-for="category in categories" :key="category.id">
+      <span :class="{'active': categoryId===0}" @click="categoryId = Number(0)">全部分类</span>
+      <span
+        v-for="category in categories"
+        :key="category.id"
+        :class="{'active': categoryId===category.id}"
+        @click="categoryId=category.id"
+      >
         {{ category.name }}
       </span>
     </div>
@@ -106,6 +96,12 @@ const params = ref({
   margin-bottom: 20px;
   font-size: 25px;
   font-family: '华文中宋', serif;
+
+  span{
+    font-size: 16px;
+    color: #6c6b6b;
+    margin-left: 10px;
+  }
 }
 
 .time {
@@ -123,16 +119,22 @@ const params = ref({
   }
 }
 
-.category {
+.category{
   height: 40px;
   margin-bottom: 15px;
   margin-left: 20px;
   background-color: #eefcff;
   line-height: 40px;
 
-  span {
-    margin-right: 18px;
+  span{
+    margin-left: 10px;
+    margin-right: 8px;
     font-size: 13px;
+    cursor: pointer;
+  }
+
+  .active{
+    color: #ed0b38;
   }
 }
 

@@ -224,7 +224,7 @@ const announcementsImg = ref(
 const announcementsItems = ref([
   {
     id: 1,
-    content: '月下蝶影新书发布',
+    content: '微兮凉新书发布',
   },
   {
     id: 2,
@@ -318,12 +318,7 @@ const numberBooks = {
   author: '微兮凉',
   number: 120201,
 }
-const noNumberBooks = {
-  id: 1,
-  name: '穿成小说男主白月光',
-  type: '现代言情',
-  author: '微兮凉',
-}
+
 const passRank = ref([
   {
     id: 1,

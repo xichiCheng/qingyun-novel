@@ -1,6 +1,10 @@
 <script setup>
 import { ref } from 'vue'
-
+import router from '@/router/index.js'
+import {useCategoryStore} from '@/stores/index.js'
+import {useUserStore} from '@/stores/index.js'
+const userStore = useUserStore()
+const categoryStore = useCategoryStore()
 const props = defineProps({
   rankBook: {
     type: Array,
@@ -26,6 +30,10 @@ const onCurrentChange = (currentPage) => {
   params.value.pageNum = currentPage
 }
 
+const toBook = (id) => {
+  const newRoute = router.resolve({ name: 'BookDetail',params: { id: id } });
+  window.open(newRoute.href, '_blank');
+}
 
 </script>
 
@@ -42,25 +50,36 @@ const onCurrentChange = (currentPage) => {
         </span>
         <img :src="book.cover" alt="书籍封面" class="book-cover" />
       </span>
-      <p class="name">{{ book.title }}</p>
+      <p class="name" @click="toBook(book.id)" style="cursor: pointer">{{ book.title }}</p>
       <p class="author">
         <el-avatar :size="12" :src="circleUrl" />
-        {{ book.author }} | {{ book.category }}·{{ book.secondary_category }} |
-        {{ book.status === 'completed' ? '完结' : '连载中' }}
+        {{ book.author }} |
+        <router-link :to="{ name: 'Category', params: { id: book.categoryId} }" target="_blank">
+          {{categoryStore.getCategory(book.categoryId).name}}
+        </router-link>
+        ·
+        <router-link :to="{ name: 'All', query: { categoryId: book.categoryId, subCategoryId: book.subcategoryId } }">
+          {{categoryStore.getSubCategory(book.categoryId,book.subcategoryId).name}}
+        </router-link>
+        |
+        {{ book.status === 2 ? '完结' : '连载中' }}
       </p>
       <p class="profile">{{ book.profile }}</p>
       <p class="chapters">最近更新 {{ book.latestChapters }}</p>
       <p class="time">{{ book.latestTime }}</p>
-      <el-button class="detail button">书籍详情</el-button>
-      <el-button class="bookshelf button">加入书架</el-button>
+      <el-button class="detail button"  @click="toBook(book.id)">书籍详情</el-button>
+      <el-button class="bookshelf button"
+                 :class="{'disable': userStore.getBookById(Number(book.id))}"
+                 :disabled="userStore.getBookById(Number(book.id))">
+        {{ userStore.getBookById(Number(book.id)) ? '已在书架' : '加入书架' }}
+      </el-button>
     </div>
     <div class="pagination">
       <el-pagination
         v-model:current-page="params.pageNum"
         v-model:page-size="params.pageSize"
-        :page-sizes="[10, 20, 30, 40]"
         :total="total"
-        layout="sizes,prev, pager, next, jumper"
+        layout="prev, pager, next, jumper"
         background
         @size-change="onSizeChange"
         @current-change="onCurrentChange"
@@ -149,6 +168,9 @@ const onCurrentChange = (currentPage) => {
       left: 130px;
       font-size: 18px;
     }
+    .name:hover{
+      color: #ed0b38;
+    }
 
     .author {
       position: absolute;
@@ -157,9 +179,20 @@ const onCurrentChange = (currentPage) => {
       font-size: 13px;
       color: #7c7b7b;
       font-family: 'fangsong', serif;
-      max-width: 255px;
+      max-width: 270px;
       overflow: hidden;
       white-space: nowrap;
+
+      a{
+        font-size: 13px;
+        color: #7c7b7b;
+        font-family: 'fangsong', serif;
+        text-decoration: none;
+      }
+
+      a:hover {
+        color: #ed0b38;
+      }
     }
 
     .profile {
@@ -178,6 +211,10 @@ const onCurrentChange = (currentPage) => {
 
     .chapters {
       position: absolute;
+      width: 210px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
       left: 130px;
       top: 120px;
       font-size: 12px;
@@ -194,11 +231,32 @@ const onCurrentChange = (currentPage) => {
       position: absolute;
       left: 550px;
       top: 120px;
+
     }
 
+    .detail {
+      background-color: #e80b36;
+      color: white;
+      border: none;
+    }
+    .detail:hover{
+      opacity: 0.7;
+    }
     .bookshelf {
+      background-color: white;
+      color: black;
       left: 650px;
     }
+    .bookshelf:hover {
+      border: 1px solid #19bad8;
+    }
+
+
+    .disable{
+      color: #8c8b8b;
+    }
+
+
   }
 }
 </style>

@@ -2,6 +2,12 @@
 import { ref, computed } from 'vue'
 import ComAffix from '@/components/ComAffix.vue'
 
+import {useCategoryStore} from '@/stores/index.js'
+import {useUserStore} from '@/stores/index.js'
+import router from '@/router/index.js'
+const userStore = useUserStore()
+const categoryStore = useCategoryStore()
+
 const props = defineProps({
   words: {
     type: String,
@@ -114,11 +120,11 @@ const books = ref(
     title: '喜欢你我说了算',
     author: '叶非夜',
     wordCount: 603000,
-    category: '现代言情',
-    secondary_category: '豪门世家',
+    categoryId: 3,
+    subcategoryId: 12,
     cover:
       'https://chen-novel.oss-cn-hangzhou.aliyuncs.com/novel/600.webp',
-    status: 'complet',
+    status: 2,
     profile:
       '林薇：我要上清华。\n' +
       '江宿：我就不一样了。\n' +
@@ -159,6 +165,11 @@ const onCurrentChange = (newPage) => {
 const handleSortChange = () => {
   sortOrder.value = referralTicket.value // 当选择推荐票时，设置当前排序为推荐票
   console.log(sortOrder.value)
+}
+
+const toBook = (id) => {
+  const newRoute = router.resolve({ name: 'BookDetail',params: { id: id } });
+  window.open(newRoute.href, '_blank');
 }
 </script>
 
@@ -240,16 +251,28 @@ const handleSortChange = () => {
         <p class="name">{{ book.title }}</p>
         <p class="author">
           <el-avatar :size="12" :src="circleUrl" />
-          {{ book.author }} | {{ book.category }}·{{ book.secondary_category }} |
-          {{ book.status === 'completed' ? '完结' : '连载中' }}
+          {{ book.author }} |
+          <router-link :to="{ name: 'Category', params: { id: book.categoryId} }" target="_blank">
+            {{categoryStore.getCategory(book.categoryId).name}}
+          </router-link>
+          ·
+          <router-link :to="{ name: 'All', query: { categoryId: book.categoryId, subCategoryId: book.subcategoryId } }">
+            {{categoryStore.getSubCategory(book.categoryId,book.subcategoryId).name}}
+          </router-link>
+          |
+          {{ book.status === 2 ? '完结' : '连载中' }}
         </p>
         <p class="profile">{{ book.profile }}</p>
         <p class="chapters">最近更新 {{ book.latestChapters }}</p>
         <p class="time">{{ book.latestTime }}</p>
         <p class="wordCount"><span>{{book.wordCount }}万</span> 总字数</p>
         <p class="recommended"><span>{{ book.recommended }}万</span> 总推荐</p>
-        <el-button class="detail button">书籍详情</el-button>
-        <el-button class="bookshelf button">加入书架</el-button>
+        <el-button class="detail button"  @click="toBook(book.id)">书籍详情</el-button>
+        <el-button class="bookshelf button"
+                   :class="{'disable': userStore.getBookById(Number(book.id))}"
+                   :disabled="userStore.getBookById(Number(book.id))">
+          {{ userStore.getBookById(Number(book.id)) ? '已在书架' : '加入书架' }}
+        </el-button>
       </div>
       <div class="pagination">
         <el-pagination
@@ -447,6 +470,7 @@ const handleSortChange = () => {
       top: -5px;
       left: 130px;
       font-size: 18px;
+
     }
 
     .author {
@@ -459,6 +483,17 @@ const handleSortChange = () => {
       max-width: 255px;
       overflow: hidden;
       white-space: nowrap;
+
+      a{
+        font-size: 13px;
+        color: #7c7b7b;
+        font-family: 'fangsong', serif;
+        text-decoration: none;
+      }
+
+      a:hover {
+        color: #ed0b38;
+      }
     }
 
     .profile {
@@ -521,13 +556,34 @@ const handleSortChange = () => {
 
     .button {
       position: absolute;
-      left: 580px;
-      top: 130px;
+      left: 570px;
+      top: 135px;
+
     }
 
-    .bookshelf {
-      left: 680px;
+    .detail {
+      background-color: #e80b36;
+      color: white;
+      border: none;
     }
+    .detail:hover{
+      opacity: 0.7;
+    }
+    .bookshelf {
+      background-color: white;
+      color: black;
+      left: 660px;
+    }
+    .bookshelf:hover {
+      border: 1px solid #19bad8;
+    }
+
+
+    .disable{
+      color: #8c8b8b;
+    }
+
+
   }
 }
 </style>
