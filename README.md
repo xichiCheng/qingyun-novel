@@ -7,6 +7,11 @@
 
 做这个玩具项目来练练手
 
+项目演示视频:
+
+[https://www.youtube.com/embed/your-video-id](https://www.bilibili.com/video/BV1Ke6nYkEUR?t=98.2)
+
+
 ### 主页
 
 ![img.png](https://chen-novel.oss-cn-hangzhou.aliyuncs.com/introduced/QQ20241225-200217.png)
